@@ -1,113 +1,119 @@
-use memory_pager::Pager;
 use std::fs::File;
 use std::io;
+use skiplist::skiplist::SkipList;
 
 use crate::change::Change;
 use crate::iter::Iter;
 
-const PAGE_SIZE: usize = 1024;
+#[derive(Debug)]
+struct Range {
+    from: usize,
+    to: usize,
+}
 
 /// Bitfield instance.
 #[derive(Debug)]
 pub struct Bitfield {
-  /// A [memory-pager] instance.
-  ///
-  /// [memory-pager]: https://docs.rs/memory-pager/
-  pages: Pager,
-
-  byte_length: usize,
+    /// A [skiplist] instance.
+    ///
+    /// [skiplist]: https://docs.rs/skiplist/
+    skiplist: SkipList<Range>,
 }
 
 impl Bitfield {
-  /// Create a new instance.
-  ///
-  /// ## Panics
-  /// The page size must be a multiple of 2, and bigger than 0.
-  pub fn new() -> Self {
-    Bitfield {
-      pages: Pager::new(PAGE_SIZE),
-      byte_length: 0,
+    /// Create a new instance.
+    ///
+    /// ## Panics
+    /// The page size must be a multiple of 2, and bigger than 0.
+    pub fn new() -> Self {
+        Bitfield {
+            skiplist: SkipList::new(),
+        }
     }
-  }
 
   /// Create a new instance from a `File`.
   pub fn from_file(
     file: &mut File,
     offset: Option<usize>,
   ) -> io::Result<Self> {
-    let pages = Pager::from_file(file, PAGE_SIZE, offset)?;
+    unimplemented!();
+    // let pages = Pager::from_file(file, PAGE_SIZE, offset)?;
 
-    // NOTE: empty pages are initialized as `0` filled. So when we reinitialize
-    // a page, in essence our byte length becomes the amount of bytes we have
-    // times the amount of pages we have.
-    let byte_length = pages.len() * PAGE_SIZE;
+    // // NOTE: empty pages are initialized as `0` filled. So when we reinitialize
+    // // a page, in essence our byte length becomes the amount of bytes we have
+    // // times the amount of pages we have.
+    // let byte_length = pages.len() * PAGE_SIZE;
 
-    Ok(Self {
-      pages,
-      byte_length,
-    })
+    // Ok(Self {
+    //   pages,
+    //   byte_length,
+    // })
   }
 
   /// Set a bit to true or false. Returns a boolean indicating if the value was
   /// changed.
   #[inline]
   pub fn set(&mut self, index: usize, value: bool) -> Change {
-    let index_mask = index & 7;
-    let byte_index = (index - index_mask) / 8;
-    let byte = self.get_byte(byte_index);
+    unimplemented!();
+    // let index_mask = index & 7;
+    // let byte_index = (index - index_mask) / 8;
+    // let byte = self.get_byte(byte_index);
 
-    if value {
-      // Mask the byte to flip a bit to `1`.
-      let byte = byte | (128 >> index_mask);
-      self.set_byte(byte_index, byte)
-    } else {
-      // Mask the byte to flip a bit to `0`.
-      let byte = byte & (255 ^ (128 >> index_mask));
-      self.set_byte(byte_index, byte)
-    }
+    // if value {
+    //   // Mask the byte to flip a bit to `1`.
+    //   let byte = byte | (128 >> index_mask);
+    //   self.set_byte(byte_index, byte)
+    // } else {
+    //   // Mask the byte to flip a bit to `0`.
+    //   let byte = byte & (255 ^ (128 >> index_mask));
+    //   self.set_byte(byte_index, byte)
+    // }
   }
 
   /// Get the value of a bit.
   #[inline]
   pub fn get(&self, index: usize) -> bool {
-    let byte_offset = index & 7;
-    let j = (index - byte_offset) / 8;
+    unimplemented!();
+    // let byte_offset = index & 7;
+    // let j = (index - byte_offset) / 8;
 
-    let num = self.get_byte(j) & (128 >> byte_offset);
-    match num {
-      0 => false,
-      _ => true,
-    }
+    // let num = self.get_byte(j) & (128 >> byte_offset);
+    // match num {
+    //   0 => false,
+    //   _ => true,
+    // }
   }
 
   /// Get a byte from our internal buffers.
   #[inline]
   pub fn get_byte(&self, index: usize) -> u8 {
-    let byte_offset = self.page_mask(index);
-    let page_num = index / PAGE_SIZE;
-    match self.pages.get(page_num) {
-      Some(page) => page[byte_offset],
-      None => 0,
-    }
+    unimplemented!();
+    // let byte_offset = self.page_mask(index);
+    // let page_num = index / PAGE_SIZE;
+    // match self.pages.get(page_num) {
+    //   Some(page) => page[byte_offset],
+    //   None => 0,
+    // }
   }
 
   /// Set a byte to the right value inside our internal buffers.
   #[inline]
   pub fn set_byte(&mut self, index: usize, byte: u8) -> Change {
-    let byte_offset = self.page_mask(index);
-    let page_num = index / PAGE_SIZE;
-    let page = self.pages.get_mut_or_alloc(page_num);
+    unimplemented!();
+    // let byte_offset = self.page_mask(index);
+    // let page_num = index / PAGE_SIZE;
+    // let page = self.pages.get_mut_or_alloc(page_num);
 
-    if index >= self.byte_length {
-      self.byte_length = index + 1;
-    }
+    // if index >= self.byte_length {
+    //   self.byte_length = index + 1;
+    // }
 
-    if page[byte_offset] == byte {
-      Change::Unchanged
-    } else {
-      page[byte_offset] = byte;
-      Change::Changed
-    }
+    // if page[byte_offset] == byte {
+    //   Change::Unchanged
+    // } else {
+    //   page[byte_offset] = byte;
+    //   Change::Changed
+    // }
   }
 
   /// Get the amount of bits in the bitfield.
@@ -127,7 +133,8 @@ impl Bitfield {
   /// ```
   #[inline]
   pub fn len(&self) -> usize {
-    self.byte_length * 8
+    unimplemented!();
+    // self.byte_length * 8
   }
 
   /// Get the amount of bytes in the bitfield.
@@ -147,7 +154,8 @@ impl Bitfield {
   /// ```
   #[inline]
   pub fn byte_len(&self) -> usize {
-    self.byte_length
+    unimplemented!();
+    // self.byte_length
   }
 
   /// Returns `true` if no bits are stored.
@@ -163,37 +171,36 @@ impl Bitfield {
   /// ```
   #[inline]
   pub fn is_empty(&self) -> bool {
-    self.pages.is_empty()
+    unimplemented!();
+    // self.pages.is_empty()
   }
 
   /// Create an `Iterator` that iterates over all pages.
   #[inline]
   pub fn iter(&mut self) -> Iter {
-    Iter::new(self)
+    unimplemented!();
+    // Iter::new(self)
   }
 
-  #[inline]
-  /// Find which page we should write to.
-  fn page_mask(&self, index: usize) -> usize {
-    index & (PAGE_SIZE - 1)
-  }
-
-  /// Based on [Bitfield.prototype.toBuffer](https://github.com/mafintosh/sparse-bitfield/blob/master/index.js#L54-L64)
+  /// Based on [Bitfield.prototype.toBuffer].
+  ///
+  /// [Bitfield.prototype.toBuffer]: https://github.com/mafintosh/sparse-bitfield/blob/master/index.js#L54-L64
   pub fn to_bytes(&self) -> std::io::Result<Vec<u8>> {
-    use std::io::{Cursor, Write};
+    unimplemented!();
+    // use std::io::{Cursor, Write};
 
-    let mut all =
-      Cursor::new(Vec::with_capacity(self.pages.len() * PAGE_SIZE));
+    // let mut all =
+    //   Cursor::new(Vec::with_capacity(self.pages.len() * PAGE_SIZE));
 
-    for index in 0..PAGE_SIZE {
-      let next = self.pages.get(index);
-      if let Some(page) = next {
-        let all_offset = index * PAGE_SIZE;
-        all.set_position(all_offset as u64);
-        all.write_all(&page)?;
-      }
-    }
+    // for index in 0..PAGE_SIZE {
+    //   let next = self.pages.get(index);
+    //   if let Some(page) = next {
+    //     let all_offset = index * PAGE_SIZE;
+    //     all.set_position(all_offset as u64);
+    //     all.write_all(&page)?;
+    //   }
+    // }
 
-    Ok(all.into_inner())
+    // Ok(all.into_inner())
   }
 }

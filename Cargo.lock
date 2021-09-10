@@ -80,12 +80,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3cb00336871be5ed2c8ed44b60ae9959dc5b9f08539422ed43f09e34ecaeba21"
 
 [[package]]
-name = "memory-pager"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad05e53b413682ea2aa20b027babc7316d5c637f5f52cff4b042f825fb76f9bb"
-
-[[package]]
 name = "num-traits"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -253,11 +247,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "skiplist"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fa37347a2b4609765d113afe55f16636ccd42dadc1ad0d29030908d1bac4c95b"
+dependencies = [
+ "rand 0.8.4",
+]
+
+[[package]]
 name = "sparser-bitfield"
 version = "0.1.0"
 dependencies = [
- "memory-pager",
  "proptest",
+ "skiplist",
  "tempfile",
 ]
 
