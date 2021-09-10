@@ -1,6 +1,6 @@
 use proptest::proptest;
 
-use sparse_bitfield::{Bitfield, Change};
+use sparser_bitfield::{Bitfield, Change};
 
 fn model(bit: usize) {
   let mut bits = Bitfield::new();

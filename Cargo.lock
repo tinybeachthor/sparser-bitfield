@@ -253,7 +253,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "sparse-bitfield"
+name = "sparser-bitfield"
 version = "0.1.0"
 dependencies = [
  "memory-pager",

@@ -1,4 +1,5 @@
-use sparse_bitfield::Bitfield;
+use sparser_bitfield::Bitfield;
+
 use tempfile::NamedTempFile;
 use std::io::prelude::*;
 

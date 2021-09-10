@@ -122,8 +122,8 @@ impl Bitfield {
   ///
   /// ## Examples
   /// ```rust
-  /// # extern crate sparse_bitfield;
-  /// # use sparse_bitfield::Bitfield;
+  /// # extern crate sparser_bitfield;
+  /// # use sparser_bitfield::Bitfield;
   /// let mut bits = Bitfield::new();
   /// assert_eq!(bits.len(), 0);
   /// bits.set(0, true);
@@ -142,8 +142,8 @@ impl Bitfield {
   ///
   /// ## Examples
   /// ```rust
-  /// # extern crate sparse_bitfield;
-  /// # use sparse_bitfield::Bitfield;
+  /// # extern crate sparser_bitfield;
+  /// # use sparser_bitfield::Bitfield;
   /// let mut bits = Bitfield::new();
   /// assert_eq!(bits.byte_len(), 0);
   /// bits.set(0, true);
@@ -162,8 +162,8 @@ impl Bitfield {
   ///
   /// ## Examples
   /// ```rust
-  /// # extern crate sparse_bitfield;
-  /// # use sparse_bitfield::Bitfield;
+  /// # extern crate sparser_bitfield;
+  /// # use sparser_bitfield::Bitfield;
   /// let mut bits = Bitfield::new();
   /// assert!(bits.is_empty());
   /// bits.set(0, true);

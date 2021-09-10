@@ -1,4 +1,4 @@
-use sparse_bitfield::{Bitfield, Change};
+use sparser_bitfield::{Bitfield, Change};
 
 #[test]
 fn can_create_bitfield() {
