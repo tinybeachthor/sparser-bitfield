@@ -13,16 +13,17 @@ use memory_pager::Pager;
 use std::fs::File;
 use std::io;
 
+const PAGE_SIZE: usize = 1024;
+
 /// Bitfield instance.
 #[derive(Debug)]
 pub struct Bitfield {
   /// A [memory-pager] instance.
   ///
   /// [memory-pager]: https://docs.rs/memory-pager/
-  pub pages: Pager,
+  pages: Pager,
 
   byte_length: usize,
-  page_length: usize,
 }
 
 impl Bitfield {
@@ -30,11 +31,9 @@ impl Bitfield {
   ///
   /// ## Panics
   /// The page size must be a multiple of 2, and bigger than 0.
-  pub fn new(page_size: usize) -> Self {
-    assert!(page_size.is_power_of_two());
+  pub fn new() -> Self {
     Bitfield {
-      pages: Pager::new(page_size),
-      page_length: 0,
+      pages: Pager::new(PAGE_SIZE),
       byte_length: 0,
     }
   }
@@ -42,20 +41,17 @@ impl Bitfield {
   /// Create a new instance from a `File`.
   pub fn from_file(
     file: &mut File,
-    page_size: usize,
     offset: Option<usize>,
   ) -> io::Result<Self> {
-    let pages = Pager::from_file(file, page_size, offset)?;
-    let page_length = pages.len();
+    let pages = Pager::from_file(file, PAGE_SIZE, offset)?;
 
     // NOTE: empty pages are initialized as `0` filled. So when we reinitialize
     // a page, in essence our byte length becomes the amount of bytes we have
     // times the amount of pages we have.
-    let byte_length = page_length * page_size;
+    let byte_length = pages.len() * PAGE_SIZE;
 
     Ok(Self {
       pages,
-      page_length,
       byte_length,
     })
   }
@@ -81,7 +77,7 @@ impl Bitfield {
 
   /// Get the value of a bit.
   #[inline]
-  pub fn get(&mut self, index: usize) -> bool {
+  pub fn get(&self, index: usize) -> bool {
     let byte_offset = index & 7;
     let j = (index - byte_offset) / 8;
 
@@ -96,7 +92,7 @@ impl Bitfield {
   #[inline]
   pub fn get_byte(&self, index: usize) -> u8 {
     let byte_offset = self.page_mask(index);
-    let page_num = index / self.page_size();
+    let page_num = index / PAGE_SIZE;
     match self.pages.get(page_num) {
       Some(page) => page[byte_offset],
       None => 0,
@@ -107,7 +103,7 @@ impl Bitfield {
   #[inline]
   pub fn set_byte(&mut self, index: usize, byte: u8) -> Change {
     let byte_offset = self.page_mask(index);
-    let page_num = index / self.page_size();
+    let page_num = index / PAGE_SIZE;
     let page = self.pages.get_mut_or_alloc(page_num);
 
     if index >= self.byte_length {
@@ -122,19 +118,13 @@ impl Bitfield {
     }
   }
 
-  /// Get the memory page size in bytes.
-  #[inline]
-  pub fn page_size(&self) -> usize {
-    self.pages.page_size()
-  }
-
   /// Get the amount of bits in the bitfield.
   ///
   /// ## Examples
   /// ```rust
   /// # extern crate sparse_bitfield;
   /// # use sparse_bitfield::Bitfield;
-  /// let mut bits = Bitfield::new(1024);
+  /// let mut bits = Bitfield::new();
   /// assert_eq!(bits.len(), 0);
   /// bits.set(0, true);
   /// assert_eq!(bits.len(), 8);
@@ -154,7 +144,7 @@ impl Bitfield {
   /// ```rust
   /// # extern crate sparse_bitfield;
   /// # use sparse_bitfield::Bitfield;
-  /// let mut bits = Bitfield::new(1024);
+  /// let mut bits = Bitfield::new();
   /// assert_eq!(bits.byte_len(), 0);
   /// bits.set(0, true);
   /// assert_eq!(bits.byte_len(), 1);
@@ -168,35 +158,13 @@ impl Bitfield {
     self.byte_length
   }
 
-  /// Get the amount of memory pages in the bitfield.
-  ///
-  /// ## Examples
-  /// ```rust
-  /// # extern crate sparse_bitfield;
-  /// # use sparse_bitfield::Bitfield;
-  /// let mut bits = Bitfield::new(1024);
-  /// assert_eq!(bits.page_len(), 0);
-  /// bits.set(0, true);
-  /// assert_eq!(bits.page_len(), 1);
-  /// bits.set(1, true);
-  /// assert_eq!(bits.page_len(), 1);
-  /// bits.set(2, false);
-  /// assert_eq!(bits.page_len(), 1);
-  /// bits.set(1024 * 8 + 1, true);
-  /// assert_eq!(bits.page_len(), 2);
-  /// ```
-  #[inline]
-  pub fn page_len(&self) -> usize {
-    self.pages.len()
-  }
-
   /// Returns `true` if no bits are stored.
   ///
   /// ## Examples
   /// ```rust
   /// # extern crate sparse_bitfield;
   /// # use sparse_bitfield::Bitfield;
-  /// let mut bits = Bitfield::new(1024);
+  /// let mut bits = Bitfield::new();
   /// assert!(bits.is_empty());
   /// bits.set(0, true);
   /// assert!(!bits.is_empty());
@@ -215,7 +183,7 @@ impl Bitfield {
   #[inline]
   /// Find which page we should write to.
   fn page_mask(&self, index: usize) -> usize {
-    index & (self.page_size() - 1)
+    index & (PAGE_SIZE - 1)
   }
 
   /// Based on [Bitfield.prototype.toBuffer](https://github.com/mafintosh/sparse-bitfield/blob/master/index.js#L54-L64)
@@ -223,26 +191,17 @@ impl Bitfield {
     use std::io::{Cursor, Write};
 
     let mut all =
-      Cursor::new(Vec::with_capacity(self.page_len() * self.page_size()));
+      Cursor::new(Vec::with_capacity(self.pages.len() * PAGE_SIZE));
 
-    for index in 0..self.page_len() {
+    for index in 0..PAGE_SIZE {
       let next = self.pages.get(index);
       if let Some(page) = next {
-        let all_offset = index * self.page_size();
+        let all_offset = index * PAGE_SIZE;
         all.set_position(all_offset as u64);
         all.write_all(&page)?;
       }
     }
 
     Ok(all.into_inner())
-  }
-}
-
-/// Create a new instance with a `page_size` of `1kb`.
-impl Default for Bitfield {
-  #[inline]
-  fn default() -> Self {
-    let page_size = 1024;
-    Bitfield::new(page_size)
   }
 }
