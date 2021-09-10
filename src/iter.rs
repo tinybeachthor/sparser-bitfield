@@ -1,5 +1,6 @@
-use super::Bitfield;
 use std::iter;
+
+use super::Bitfield;
 
 /// Iterate over a `Bitfield` instance.
 // TODO: the most efficient way to iterate this is to get a page at the time &
