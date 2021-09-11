@@ -1,7 +1,6 @@
 use skiplist::skiplist::SkipList;
 
 use crate::change::Change;
-use crate::iter::Iter;
 
 pub type Range = std::ops::Range<usize>;
 
@@ -132,7 +131,7 @@ impl Bitfield {
     /// Reset a bit.
     /// Returns a `Change` indicating if the value was changed.
     #[inline]
-    pub fn reset(&mut self, index: usize) -> Change {
+    pub fn reset(&mut self, _index: usize) -> Change {
         unimplemented!()
     }
 
@@ -191,11 +190,4 @@ impl Bitfield {
         self.skiplist
             .is_empty()
     }
-
-  /// Create an `Iterator` that iterates over all pages.
-  #[inline]
-  pub fn iter(&mut self) -> Iter {
-    unimplemented!();
-    // Iter::new(self)
-  }
 }

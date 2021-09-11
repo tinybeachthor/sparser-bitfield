@@ -50,30 +50,3 @@ fn exposes_changed_unchanged_methods() {
   assert!(bits.set(0).is_changed());
   assert!(bits.set(0).is_unchanged());
 }
-
-#[test]
-fn can_iterate() {
-  let mut bits = Bitfield::new();
-
-  bits.set(0);
-  for (i, bit) in bits.iter().enumerate() {
-    match i {
-      0 => assert_eq!(bit, true),
-      _ => assert_eq!(bit, false),
-    }
-  }
-
-  let arr: Vec<bool> = bits.iter().collect();
-  assert_eq!(arr.len(), 8);
-
-  bits.reset(1);
-  for (i, bit) in bits.iter().enumerate() {
-    match i {
-      0 => assert_eq!(bit, true),
-      _ => assert_eq!(bit, false),
-    }
-  }
-
-  let arr: Vec<bool> = bits.iter().collect();
-  assert_eq!(arr.len(), 8);
-}
