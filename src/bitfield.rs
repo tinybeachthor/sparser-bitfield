@@ -159,11 +159,11 @@ impl Bitfield {
     /// let mut bits = Bitfield::new();
     /// assert_eq!(bits.len(), 0);
     /// bits.set(0);
-    /// assert_eq!(bits.len(), 8);
+    /// assert_eq!(bits.len(), 1);
     /// bits.set(1);
-    /// assert_eq!(bits.len(), 8);
+    /// assert_eq!(bits.len(), 2);
     /// bits.reset(9);
-    /// assert_eq!(bits.len(), 16);
+    /// assert_eq!(bits.len(), 2);
     /// ```
     #[inline]
     pub fn len(&self) -> usize {
