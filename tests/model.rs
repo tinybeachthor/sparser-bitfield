@@ -4,7 +4,7 @@ use sparser_bitfield::{Bitfield, Change};
 
 fn model(bit: usize) {
   let mut bits = Bitfield::new();
-  assert_eq!(bits.set(bit, true), Change::Changed);
+  assert_eq!(bits.set(bit), Change::Changed);
   assert_eq!(bits.get(bit), true);
 }
 

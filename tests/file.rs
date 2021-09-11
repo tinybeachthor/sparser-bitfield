@@ -6,7 +6,7 @@ use std::io::prelude::*;
 #[test]
 fn write_then_read_from_file() -> std::io::Result<()> {
     let mut bitfield = Bitfield::new();
-    bitfield.set(2, true);
+    bitfield.set(2);
 
     let mut file = NamedTempFile::new()?;
     let mut file2 = file.reopen()?;
@@ -32,8 +32,8 @@ fn write_then_read_from_file() -> std::io::Result<()> {
 #[test]
 fn write_then_read_from_file_large() -> std::io::Result<()> {
     let mut bitfield = Bitfield::new();
-    bitfield.set(2, true);
-    bitfield.set(10_000_102, true);
+    bitfield.set(2);
+    bitfield.set(10_000_102);
 
     let mut file = NamedTempFile::new()?;
     let mut file2 = file.reopen()?;
