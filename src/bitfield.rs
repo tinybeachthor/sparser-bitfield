@@ -66,19 +66,20 @@ impl Bitfield {
     // }
   }
 
-  /// Get the value of a bit.
-  #[inline]
-  pub fn get(&self, index: usize) -> bool {
-    unimplemented!();
-    // let byte_offset = index & 7;
-    // let j = (index - byte_offset) / 8;
+    /// Get the value of a bit.
+    #[inline]
+    pub fn get(&self, index: usize) -> bool {
+        let mut iter = self.skiplist
+            .iter()
+            .skip_while(|range| {
+                index < range.start
+            });
 
-    // let num = self.get_byte(j) & (128 >> byte_offset);
-    // match num {
-    //   0 => false,
-    //   _ => true,
-    // }
-  }
+        match iter.next() {
+            None => false,
+            Some(range) => range.contains(&index),
+        }
+    }
 
     /// Get the amount of bits in the bitfield.
     ///
