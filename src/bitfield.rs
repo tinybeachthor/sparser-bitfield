@@ -5,11 +5,7 @@ use skiplist::skiplist::SkipList;
 use crate::change::Change;
 use crate::iter::Iter;
 
-#[derive(Debug)]
-struct Range {
-    from: usize,
-    to: usize,
-}
+pub type Range = std::ops::Range<usize>;
 
 /// Bitfield instance.
 #[derive(Debug)]
@@ -84,96 +80,46 @@ impl Bitfield {
     // }
   }
 
-  /// Get a byte from our internal buffers.
-  #[inline]
-  pub fn get_byte(&self, index: usize) -> u8 {
-    unimplemented!();
-    // let byte_offset = self.page_mask(index);
-    // let page_num = index / PAGE_SIZE;
-    // match self.pages.get(page_num) {
-    //   Some(page) => page[byte_offset],
-    //   None => 0,
-    // }
-  }
+    /// Get the amount of bits in the bitfield.
+    ///
+    /// ## Examples
+    /// ```rust
+    /// # extern crate sparser_bitfield;
+    /// # use sparser_bitfield::Bitfield;
+    /// let mut bits = Bitfield::new();
+    /// assert_eq!(bits.len(), 0);
+    /// bits.set(0, true);
+    /// assert_eq!(bits.len(), 8);
+    /// bits.set(1, true);
+    /// assert_eq!(bits.len(), 8);
+    /// bits.set(9, false);
+    /// assert_eq!(bits.len(), 16);
+    /// ```
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.skiplist
+            .back()
+            .map_or(
+                0,
+                |last| last.end)
+    }
 
-  /// Set a byte to the right value inside our internal buffers.
-  #[inline]
-  pub fn set_byte(&mut self, index: usize, byte: u8) -> Change {
-    unimplemented!();
-    // let byte_offset = self.page_mask(index);
-    // let page_num = index / PAGE_SIZE;
-    // let page = self.pages.get_mut_or_alloc(page_num);
-
-    // if index >= self.byte_length {
-    //   self.byte_length = index + 1;
-    // }
-
-    // if page[byte_offset] == byte {
-    //   Change::Unchanged
-    // } else {
-    //   page[byte_offset] = byte;
-    //   Change::Changed
-    // }
-  }
-
-  /// Get the amount of bits in the bitfield.
-  ///
-  /// ## Examples
-  /// ```rust
-  /// # extern crate sparser_bitfield;
-  /// # use sparser_bitfield::Bitfield;
-  /// let mut bits = Bitfield::new();
-  /// assert_eq!(bits.len(), 0);
-  /// bits.set(0, true);
-  /// assert_eq!(bits.len(), 8);
-  /// bits.set(1, true);
-  /// assert_eq!(bits.len(), 8);
-  /// bits.set(9, false);
-  /// assert_eq!(bits.len(), 16);
-  /// ```
-  #[inline]
-  pub fn len(&self) -> usize {
-    unimplemented!();
-    // self.byte_length * 8
-  }
-
-  /// Get the amount of bytes in the bitfield.
-  ///
-  /// ## Examples
-  /// ```rust
-  /// # extern crate sparser_bitfield;
-  /// # use sparser_bitfield::Bitfield;
-  /// let mut bits = Bitfield::new();
-  /// assert_eq!(bits.byte_len(), 0);
-  /// bits.set(0, true);
-  /// assert_eq!(bits.byte_len(), 1);
-  /// bits.set(1, true);
-  /// assert_eq!(bits.byte_len(), 1);
-  /// bits.set(9, false);
-  /// assert_eq!(bits.byte_len(), 2);
-  /// ```
-  #[inline]
-  pub fn byte_len(&self) -> usize {
-    unimplemented!();
-    // self.byte_length
-  }
-
-  /// Returns `true` if no bits are stored.
-  ///
-  /// ## Examples
-  /// ```rust
-  /// # extern crate sparser_bitfield;
-  /// # use sparser_bitfield::Bitfield;
-  /// let mut bits = Bitfield::new();
-  /// assert!(bits.is_empty());
-  /// bits.set(0, true);
-  /// assert!(!bits.is_empty());
-  /// ```
-  #[inline]
-  pub fn is_empty(&self) -> bool {
-    unimplemented!();
-    // self.pages.is_empty()
-  }
+    /// Returns `true` if no bits are stored.
+    ///
+    /// ## Examples
+    /// ```rust
+    /// # extern crate sparser_bitfield;
+    /// # use sparser_bitfield::Bitfield;
+    /// let mut bits = Bitfield::new();
+    /// assert!(bits.is_empty());
+    /// bits.set(0, true);
+    /// assert!(!bits.is_empty());
+    /// ```
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.skiplist
+            .is_empty()
+    }
 
   /// Create an `Iterator` that iterates over all pages.
   #[inline]
