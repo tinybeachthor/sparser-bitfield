@@ -21,7 +21,7 @@ fn can_set_bits() {
   bits.set(1_000);
   bits.set(1_000_000);
   bits.set(1_000_000_000);
-  // bits.set(1_000_000_000_000, true);
+  bits.set(1_000_000_000_000);
 }
 
 #[test]
@@ -76,30 +76,4 @@ fn can_iterate() {
 
   let arr: Vec<bool> = bits.iter().collect();
   assert_eq!(arr.len(), 8);
-}
-
-#[test]
-fn can_convert_to_bytes_buffer() {
-  let mut bits = Bitfield::new();
-
-  assert_eq!(bits.to_bytes().unwrap(), vec![]);
-
-  bits.set(0);
-
-  let mut target = vec![0; 1024];
-  target[0] = 128;
-  assert_eq!(
-    bits.to_bytes().unwrap(),
-    target
-  );
-
-  bits.set(9000);
-
-  let mut target2 = vec![0; 1024*2];
-  target2[0] = 128;
-  target2[9000/8] = 128;
-  assert_eq!(
-      bits.to_bytes().unwrap(),
-      target2
-    );
 }

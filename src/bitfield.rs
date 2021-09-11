@@ -1,5 +1,3 @@
-use std::fs::File;
-use std::io;
 use skiplist::skiplist::SkipList;
 
 use crate::change::Change;
@@ -27,25 +25,6 @@ impl Bitfield {
             skiplist: SkipList::new(),
         }
     }
-
-  /// Create a new instance from a `File`.
-  pub fn from_file(
-    file: &mut File,
-    offset: Option<usize>,
-  ) -> io::Result<Self> {
-    unimplemented!();
-    // let pages = Pager::from_file(file, PAGE_SIZE, offset)?;
-
-    // // NOTE: empty pages are initialized as `0` filled. So when we reinitialize
-    // // a page, in essence our byte length becomes the amount of bytes we have
-    // // times the amount of pages we have.
-    // let byte_length = pages.len() * PAGE_SIZE;
-
-    // Ok(Self {
-    //   pages,
-    //   byte_length,
-    // })
-  }
 
     /// Set or reset a bit.
     /// Returns a `Change` indicating if the value was changed.
@@ -218,27 +197,5 @@ impl Bitfield {
   pub fn iter(&mut self) -> Iter {
     unimplemented!();
     // Iter::new(self)
-  }
-
-  /// Based on [Bitfield.prototype.toBuffer].
-  ///
-  /// [Bitfield.prototype.toBuffer]: https://github.com/mafintosh/sparse-bitfield/blob/master/index.js#L54-L64
-  pub fn to_bytes(&self) -> std::io::Result<Vec<u8>> {
-    unimplemented!();
-    // use std::io::{Cursor, Write};
-
-    // let mut all =
-    //   Cursor::new(Vec::with_capacity(self.pages.len() * PAGE_SIZE));
-
-    // for index in 0..PAGE_SIZE {
-    //   let next = self.pages.get(index);
-    //   if let Some(page) = next {
-    //     let all_offset = index * PAGE_SIZE;
-    //     all.set_position(all_offset as u64);
-    //     all.write_all(&page)?;
-    //   }
-    // }
-
-    // Ok(all.into_inner())
   }
 }
