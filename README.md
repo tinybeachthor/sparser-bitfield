@@ -1,5 +1,11 @@
 # sparser-bitfield
 
+__ARCHIVED__
+There is already something similar: [ranges](https://docs.rs/ranges/).
+This uses `Vec` internally, might be worth switching to `SkipList`,
+maybe not worth it since for my use case the bitfields will mostly have
+long continuous segments.
+
 ## Usage
 
 ```rust
