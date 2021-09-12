@@ -87,9 +87,9 @@ impl Bitfield {
                     if let Some(next) = iter.next() {
                         if range.end == next.start {
                             range.end = next.end;
-                            if let Some(index) = iter.position(|_| true) {
+                            if let Some(next_index) = iter.position(|_| true) {
                                 self.skiplist
-                                    .remove(index - 1);
+                                    .remove(next_index - 1);
                             }
                         }
                     }
@@ -111,13 +111,20 @@ impl Bitfield {
                                 next.start = index
                             }
                             else {
-                                if let Some(index) = iter.position(|_| true) {
-                                    self.skiplist
-                                        .insert(Range { start: index, end: index + 1 },
-                                                index - 1);
-                                }
-                                else {
-                                    unreachable!();
+                                let new_range = Range { start: index, end: index + 1 };
+
+                                match iter.position(|_| true) {
+                                    Some(next_index) => {
+                                        if next_index > 0 {
+                                            self.skiplist.insert(new_range, next_index - 1);
+                                        }
+                                        else {
+                                            self.skiplist.push_front(new_range);
+                                        }
+                                    },
+                                    None => {
+                                        self.skiplist.push_back(new_range);
+                                    },
                                 }
                             }
                             Change::Changed
