@@ -260,8 +260,8 @@ name = "sparser-bitfield"
 version = "0.1.0"
 dependencies = [
  "proptest",
+ "rand 0.8.4",
  "skiplist",
- "tempfile",
 ]
 
 [[package]]
